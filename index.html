@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+  <meta charset="UTF-8">
+  <title>二択クイズ(仮)</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    .quiz-box { margin: 30px auto; width: 400px; }
+    button { display: block; margin: 10px auto; padding: 10px; width: 200px; }
+    #nextBtn { display: none; margin-top: 20px; }
+    #feedback { font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>二択クイズ</h1>
+  <div class="quiz-box">
+    <p id="question"></p>
+    <div id="choices"></div>
+    <p id="feedback"></p>
+    <button id="nextBtn">次へ</button>
+  </div>
+  <div id="result"></div>
+
+  <script>
+    const questions = [
+      { q: "交差点（優先道路を通行している場合を除く）、踏切、横断歩道や自転車横断帯とこれらの手前３０メートル以内のところでは、すべて追い越しが禁止されている。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "オートマチック車でエンジンを始動する時は、エンジンを始動する前にブレーキペダルを踏んでその位置を確認し、アクセルペダルの位置も目で見て確認することが大切である。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "進行方向別通行区分を通行しているとき、緊急自動車が近づいてきた場合は、その指定区分に従わなくてもよい。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "安全な速度とは、制限速度や法定最高速度で走ることをいう。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "交差点とその付近は、最も交通事故の多い危険な場所であるので、歩行者や他の車に注意するとともに見えないところに潜む危険を予測し、できる限り安全な速度と方法で通行しなければならない。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "横断歩道のない道路を横断している歩行者に対は、車の方が優先する。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "軌道敷内通行可の標識があるところでは、自動車の通行は認められているが、後方から路面電車が近づいてきたときは、すみやかに軌道敷外に出るか十分な距離を保たなければならない。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "一方通行の道路で、道路外に出るため右折しようとするときは、あらかじめできるだけ道路の右端に寄って徐行しなければならない。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "道路で転回禁止の道路標示が書かれていると車は自由に方向を変えられる。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "青色信号では、自動車、一般原動機付自転車、軽車両と特定小型原動機付自転車は直進し、右折し、左折することができる。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "転回禁止」の標識や標示がないところであっても、歩行者や他の車などの正常な交通を妨げるおそれがあるときは、転回してはいけない。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "左右の見通しのきかない交差点は危険な場所なので、どんな場合であっても徐行しなければならない。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "普通二輪免許で、小型特殊自動車の運転ができる。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "前方の信号機の信号が青色であっても、交通が混雑しているためそのまま進行すれば交差点内で止まってしまい、交差道路の交通を妨害するおそれがあるときは、交差点内に進入してはならない。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "普通免許を取得して1年未満のものがつけなければならない「初心者マーク」は車の前面か後面のどちらか一方につければよい。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "車両通行帯のある道路では、車両通行帯をみだりに変えて通行すると、後続車の迷惑になったり事故の原因にもなるので、追い越しなどやむを得ない場合のほかは、同一の通行帯を通行しなければならない。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "交差点以外の場所で横断歩道や自転車横断帯も踏切もないところに信号機があるときの停止位置は、信号機の直前で停止する。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "車は原則として道路の中央から左の部分を通行しなければならない。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "「仮免許練習中」の標識をつけている車に対しては、幅寄せや割り込みをしてはならないが、「高齢者マーク」の標識をつけている車に対しては、特に禁止されていない。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "遮断機が上がった直後に踏切を通過するときは、一時停止しなくてもよい。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "道路交通法の目的は、道路における危険を防止し、交通の安全と円滑を図り、交通によって起きる障害の防止を図ることにある。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "交差点に先に入った右折車は、直進車や左折車に優先して通行することができる。", choices: ["⭕️", "❌"], answer: 1 },
+      { q: "立入禁止部分の標示は、「この中に車を乗り入れてはならない」ことを示している。", choices: ["⭕️", "❌"], answer: 0 },
+      { q: "同一方向に二つの車両通行帯があるときは、左側の通行帯を通行しなければならない。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "前車が右折するため、道路の中央に寄ろうとして合図をしたが、前車の右側があいていたので、右側を通行した。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "停留所に止まっている路線バスに追いついたときは、後方で一時停止し、路線バスが発進するまで待たなければならない。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "疲れているときや心配ごとがあるときは、運転に集中できないので、車の運転をしないようにする。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "歩行者や他の車の正常な進行を妨げる場合は、横断や転回や後退をしてはいけない。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "前方の道路の幅が狭く、対向車と行き違うとき安全な間隔がとれないと判断したので、速度を上げて先に通過した。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "青い長方形に白い矢印のマークが描かれているのは、「左折可」を示すものである。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "交差点が近くにない一方通行の道路で緊急自動車が近づいてきたときは、状況によっては、右側に寄って進路を譲る場合もある。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "警察官の手信号が止まれであったが、信号機の信号が青色であったのでそのまま進行した。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "制動距離は、空走距離と停止距離を合わせた距離である。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "交差点で対面する信号が青でも、前方が混雑していてそのまま進むと交差点内で停車するおそれがあるときは、交差点に入ってはならない。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "他人に迷惑をかけるような大きな騒音を発する急発進や急加速、空ぶかしをしてはならない。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "一方通行の出口である場所には、車は入ってはいけない。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "車を運転して横断歩道に近づいたとき、横断する人が明らかにいなかったので、そのままの速度で進行した。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "道路外に出るため、右折や左折の合図をする時期は、その行為をしようとする地点の３０メートル手前に達したときである。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "専用通行帯の道路標識のある道路で、バスが通行していないときは、普通自動車でも通行できる。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "前の車が右左折や進路を変えるため合図をしているときは、急ブレーキや急ハンドルで避けなければならないとき以外は、その進路の変更を妨げてはならない。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "自動車に６歳未満の幼児を乗せて運転するときは、発育の程度に応じた形状のチャイルドシートを使用するのが安全である。", choices:  ["⭕️", "❌"], answer: 0 },
+      { q: "黄色い線が道路の中央にある場合、車はその線を越えて追い越してもよい。", choices:  ["⭕️", "❌"], answer: 1 },
+      { q: "運転者は、自分本位の考えは捨てて、まわりの歩行者や運転者の立場を尊重し、お互いに譲り合う気持ちをもつことが大切である。", choices:  ["⭕️", "❌"], answer: 0 }
+    ];
+
+    let current = 0, score = 0;
+
+    const questionEl = document.getElementById("question");
+    const choicesDiv = document.getElementById("choices");
+    const feedbackEl = document.getElementById("feedback");
+    const nextBtn = document.getElementById("nextBtn");
+    const resultDiv = document.getElementById("result");
+
+    function showQuestion() {
+      feedbackEl.textContent = "";
+      nextBtn.style.display = "none";
+      questionEl.textContent = questions[current].q;
+      choicesDiv.innerHTML = "";
+      questions[current].choices.forEach((c, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = c;
+        btn.onclick = () => checkAnswer(i);
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(i) {
+      // ボタンを押した後、選択肢を無効化
+      Array.from(choicesDiv.children).forEach(btn => btn.disabled = true);
+
+      if (i === questions[current].answer) {
+        feedbackEl.textContent = "⭕ 正解！";
+        score++;
+      } else {
+        feedbackEl.textContent = "❌ 不正解…";
+      }
+      nextBtn.style.display = "block";
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        finishQuiz();
+      }
+    };
+
+    function finishQuiz() {
+      document.querySelector(".quiz-box").style.display = "none";
+      resultDiv.innerHTML = `<h2>${questions.length}問中${score}問正解でした！</h2>`;
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
